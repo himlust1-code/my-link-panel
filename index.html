@@ -2,21 +2,105 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>My Link Panel</title>
+<meta charset="UTF-8">
+<title>My Link Manager</title>
 </head>
+
 <body>
 
-    <h1>My Link Collection</h1>
+<h1>My Link Manager</h1>
 
-    <h2>Useful Links</h2>
+<h3>Add New Link</h3>
 
-    <ul>
-        <li><a href="https://www.google.com">Google</a></li>
-        <li><a href="https://www.youtube.com">YouTube</a></li>
-        <li><a href="https://github.com">GitHub</a></li>
-    </ul>
+<form id="linkForm">
+    <input
+        type="text"
+        id="linkName"
+        placeholder="Link Name"
+        required
+    >
+
+    <br><br>
+
+    <input
+        type="url"
+        id="linkUrl"
+        placeholder="Paste URL"
+        required
+    >
+
+    <br><br>
+
+    <button type="submit">Save Link</button>
+</form>
+
+<h2>My Saved Links</h2>
+
+<ul id="linkList"></ul>
+
+<script>
+const form = document.getElementById("linkForm");
+const list = document.getElementById("linkList");
+
+let links = JSON.parse(
+    localStorage.getItem("myLinks") || "[]"
+);
+
+function showLinks() {
+    list.innerHTML = "";
+
+    links.forEach((link, index) => {
+        const li = document.createElement("li");
+
+        const a = document.createElement("a");
+        a.href = link.url;
+        a.textContent = link.name;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+
+        const del = document.createElement("button");
+        del.textContent = "Delete";
+
+        del.onclick = function() {
+            links.splice(index, 1);
+            saveLinks();
+        };
+
+        li.appendChild(a);
+        li.appendChild(document.createTextNode(" "));
+        li.appendChild(del);
+
+        list.appendChild(li);
+    });
+}
+
+function saveLinks() {
+    localStorage.setItem(
+        "myLinks",
+        JSON.stringify(links)
+    );
+    showLinks();
+}
+
+form.addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const name = document.getElementById("linkName").value.trim();
+    const url = document.getElementById("linkUrl").value.trim();
+
+    if (!/^https?:\/\//i.test(url)) {
+        alert("Enter a valid HTTP or HTTPS URL");
+        return;
+    }
+
+    links.push({name, url});
+
+    saveLinks();
+    form.reset();
+});
+
+showLinks();
+</script>
 
 </body>
-  </html>
-  
+</html>
